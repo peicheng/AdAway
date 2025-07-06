@@ -31,11 +31,11 @@ jobs:
      #   run: ./gradlew test --stacktrace
 
       - name: Build with Gradle
-        run: ./gradlew assembleRelease --stacktrace  -x lint
+        run: ./gradlew assembleDebug -x lint
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
            name: AdAway-dev
-           path: app/build/outputs/apk/release/app-release-unsigned.apk
+           path: app/build/outputs/apk/*
       
