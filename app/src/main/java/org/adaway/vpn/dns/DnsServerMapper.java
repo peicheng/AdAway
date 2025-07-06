@@ -145,6 +145,7 @@ public class DnsServerMapper {
         e.printStackTrace();
         return emptyList();
         }
+        /**
         if (activeNetwork == null) {
             return getAnyNonVpnNetworkDns(connectivityManager);
         } else if (isNotVpnNetwork(connectivityManager, activeNetwork)) {
@@ -153,6 +154,7 @@ public class DnsServerMapper {
         } else {
             return getDnsFromNonVpnNetworkWithMatchingTransportType(connectivityManager, activeNetwork);
         }
+        **/
     }
 
     /**
