@@ -143,7 +143,7 @@ public class DnsServerMapper {
         );
     } catch (UnknownHostException e) {
         e.printStackTrace();
-        return Collections.emptyList();
+        return emptyList();
         }
         if (activeNetwork == null) {
             return getAnyNonVpnNetworkDns(connectivityManager);
