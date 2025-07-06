@@ -137,8 +137,8 @@ public class DnsServerMapper {
         Network activeNetwork = connectivityManager.getActiveNetwork();
         return Arrays.asList(
             InetAddress.getByName("8.8.8.8"),
-            InetAddress.getByName("101.101.101.101")
-        );
+            InetAddress.getByName("101.101.101.101"));
+        
         if (activeNetwork == null) {
             return getAnyNonVpnNetworkDns(connectivityManager);
         } else if (isNotVpnNetwork(connectivityManager, activeNetwork)) {
