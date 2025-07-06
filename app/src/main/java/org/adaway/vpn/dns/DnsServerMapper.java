@@ -40,9 +40,9 @@ public class DnsServerMapper {
      * The TEST NET addresses blocks, defined in RFC5735.
      */
     private static final String[] TEST_NET_ADDRESS_BLOCKS = {
-            "192.0.2.0/24", // TEST-NET-1
-            "198.51.100.0/24", // TEST-NET-2
-            "203.0.113.0/24" // TEST-NET-3
+        "192.0.2.0/24", // TEST-NET-1
+        "198.51.100.0/24", // TEST-NET-2
+        "203.0.113.0/24" // TEST-NET-3
     };
     /**
      * This IPv6 address prefix for documentation, defined in RFC3849.
@@ -55,13 +55,13 @@ public class DnsServerMapper {
     /**
      * The original DNS servers.
      */
-    private final List<InetAddress> dnsServers;
+    private final List < InetAddress > dnsServers;
 
     /**
      * Constructor.
      */
     public DnsServerMapper() {
-        this.dnsServers = new ArrayList<>();
+        this.dnsServers = new ArrayList < > ();
     }
 
     /**
@@ -74,13 +74,13 @@ public class DnsServerMapper {
      */
     public void configureVpn(Context context, VpnService.Builder builder) {
         // Get DNS servers
-        List<InetAddress> dnsServers = getNetworkDnsServers(context);
+        List < InetAddress > dnsServers = getNetworkDnsServers(context);
         // Configure tunnel network address
         Subnet ipv4Subnet = addIpv4Address(builder);
         Subnet ipv6Subnet = hasIpV6DnsServers(context, dnsServers) ? addIpv6Address(builder) : null;
         // Configure DNS mapping
         this.dnsServers.clear();
-        for (InetAddress dnsServer : dnsServers) {
+        for (InetAddress dnsServer: dnsServers) {
             Subnet subnetForDnsServer = dnsServer instanceof Inet4Address ? ipv4Subnet : ipv6Subnet;
             if (subnetForDnsServer == null) {
                 continue;
@@ -114,7 +114,7 @@ public class DnsServerMapper {
      * @param fakeDnsAddress The fake DNS address to get the original DNS server address.
      * @return The original DNS server address, wrapped into an {@link Optional} or {@link Optional#empty()} if it does not exists.
      */
-    Optional<InetAddress> getDnsServerFromFakeAddress(InetAddress fakeDnsAddress) {
+    Optional < InetAddress > getDnsServerFromFakeAddress(InetAddress fakeDnsAddress) {
         byte[] address = fakeDnsAddress.getAddress();
         int index = address[address.length - 1] - 2;
         if (index < 0 || index >= this.dnsServers.size()) {
@@ -131,14 +131,14 @@ public class DnsServerMapper {
      * @param context The application context.
      * @return The DNS server addresses, an empty collection if no network.
      */
-    private List<InetAddress> getNetworkDnsServers(Context context) {
+    private List < InetAddress > getNetworkDnsServers(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
         dumpNetworkInfo(connectivityManager);
         Network activeNetwork = connectivityManager.getActiveNetwork();
         return Arrays.asList(
-        InetAddress.getByName("8.8.8.8"),
-        InetAddress.getByName("101.101.101.101")
-        );
+            InetAddress.getByName("8.8.8.8"),
+            InetAddress.getByName("101.101.101.101")
+        );
         if (activeNetwork == null) {
             return getAnyNonVpnNetworkDns(connectivityManager);
         } else if (isNotVpnNetwork(connectivityManager, activeNetwork)) {
@@ -157,24 +157,24 @@ public class DnsServerMapper {
     private void dumpNetworkInfo(ConnectivityManager connectivityManager) {
         Network activeNetwork = connectivityManager.getActiveNetwork();
         Timber.d("Dumping network and dns configuration:");
-        for (Network network : connectivityManager.getAllNetworks()) {
+        for (Network network: connectivityManager.getAllNetworks()) {
             NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(network);
             boolean cellular = networkCapabilities != null && networkCapabilities.hasTransport(TRANSPORT_CELLULAR);
             boolean wifi = networkCapabilities != null && networkCapabilities.hasTransport(TRANSPORT_WIFI);
             boolean vpn = networkCapabilities != null && networkCapabilities.hasTransport(TRANSPORT_VPN);
             LinkProperties linkProperties = connectivityManager.getLinkProperties(network);
             String dnsList = linkProperties == null ? "none" : linkProperties.getDnsServers()
-                    .stream()
-                    .map(InetAddress::toString)
-                    .collect(Collectors.joining(", "));
+                .stream()
+                .map(InetAddress::toString)
+                .collect(Collectors.joining(", "));
             Timber.d(
-                    "Network %s %s: %s%s%s with dns %s",
-                    network,
-                    network.equals(activeNetwork) ? "[default]" : "[other]",
-                    cellular ? "cellular" : "",
-                    wifi ? "WiFi" : "",
-                    vpn ? " VPN" : "",
-                    dnsList);
+                "Network %s %s: %s%s%s with dns %s",
+                network,
+                network.equals(activeNetwork) ? "[default]" : "[other]",
+                cellular ? "cellular" : "",
+                wifi ? "WiFi" : "",
+                vpn ? " VPN" : "",
+                dnsList);
         }
     }
 
@@ -184,10 +184,10 @@ public class DnsServerMapper {
      * @param connectivityManager The connectivity manager.
      * @return The DNS server addresses, an empty collection if no applicable DNS server found.
      */
-    private List<InetAddress> getAnyNonVpnNetworkDns(ConnectivityManager connectivityManager) {
-        for (Network network : connectivityManager.getAllNetworks()) {
+    private List < InetAddress > getAnyNonVpnNetworkDns(ConnectivityManager connectivityManager) {
+        for (Network network: connectivityManager.getAllNetworks()) {
             if (isNotVpnNetwork(connectivityManager, network)) {
-                List<InetAddress> dnsServers = getNetworkDnsServers(connectivityManager, network);
+                List < InetAddress > dnsServers = getNetworkDnsServers(connectivityManager, network);
                 if (!dnsServers.isEmpty()) {
                     Timber.d("Get DNS servers from non VPN network %s", network);
                     return dnsServers;
@@ -204,9 +204,9 @@ public class DnsServerMapper {
      * @param activeNetwork       The active network to filter similar transport type.
      * @return The DNS server addresses, an empty collection if no applicable DNS server found.
      */
-    private List<InetAddress> getDnsFromNonVpnNetworkWithMatchingTransportType(
-            ConnectivityManager connectivityManager,
-            Network activeNetwork
+    private List < InetAddress > getDnsFromNonVpnNetworkWithMatchingTransportType(
+        ConnectivityManager connectivityManager,
+        Network activeNetwork
     ) {
         // Get active network transport
         NetworkCapabilities activeNetworkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork);
@@ -220,13 +220,13 @@ public class DnsServerMapper {
             activeNetworkTransport = TRANSPORT_WIFI;
         }
         // Check all network to find one without VPN and matching transport
-        for (Network network : connectivityManager.getAllNetworks()) {
+        for (Network network: connectivityManager.getAllNetworks()) {
             NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(network);
             if (networkCapabilities == null) {
                 continue;
             }
             if (networkCapabilities.hasTransport(activeNetworkTransport) && !networkCapabilities.hasTransport(TRANSPORT_VPN)) {
-                List<InetAddress> dns = getNetworkDnsServers(connectivityManager, network);
+                List < InetAddress > dns = getNetworkDnsServers(connectivityManager, network);
                 if (!dns.isEmpty()) {
                     Timber.d("Get DNS servers from non VPN matching type network %s", network);
                     return dns;
@@ -243,7 +243,7 @@ public class DnsServerMapper {
      * @param network             The network to get DNS server addresses.
      * @return The DNS server addresses, an empty collection if no network.
      */
-    private List<InetAddress> getNetworkDnsServers(ConnectivityManager connectivityManager, Network network) {
+    private List < InetAddress > getNetworkDnsServers(ConnectivityManager connectivityManager, Network network) {
         LinkProperties linkProperties = connectivityManager.getLinkProperties(network);
         if (linkProperties == null) {
             return emptyList();
@@ -273,7 +273,7 @@ public class DnsServerMapper {
      * @return The IPv4 address of the VPN network.
      */
     private Subnet addIpv4Address(VpnService.Builder builder) {
-        for (String addressBlock : TEST_NET_ADDRESS_BLOCKS) {
+        for (String addressBlock: TEST_NET_ADDRESS_BLOCKS) {
             try {
                 Subnet subnet = Subnet.parse(addressBlock);
                 InetAddress address = subnet.getAddress(0);
@@ -300,10 +300,9 @@ public class DnsServerMapper {
         return subnet;
     }
 
-
-    private boolean hasIpV6DnsServers(Context context, Collection<InetAddress> dnsServers) {
+    private boolean hasIpV6DnsServers(Context context, Collection < InetAddress > dnsServers) {
         boolean hasIpv6Server = dnsServers.stream()
-                .anyMatch(server -> server instanceof Inet6Address);
+            .anyMatch(server -> server instanceof Inet6Address);
         boolean hasOnlyOnServer = dnsServers.size() == 1;
         boolean isIpv6Enabled = PreferenceHelper.getEnableIpv6(context);
         return (isIpv6Enabled || hasOnlyOnServer) && hasIpv6Server;
