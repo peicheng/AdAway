@@ -136,10 +136,15 @@ public class DnsServerMapper {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
         dumpNetworkInfo(connectivityManager);
         Network activeNetwork = connectivityManager.getActiveNetwork();
+        try {
         return Arrays.asList(
             InetAddress.getByName("8.8.8.8"),
-            InetAddress.getByName("101.101.101.101"));
-        
+            InetAddress.getByName("101.101.101.101")
+        );
+    } catch (UnknownHostException e) {
+        e.printStackTrace();
+        return Collections.emptyList();
+        }
         if (activeNetwork == null) {
             return getAnyNonVpnNetworkDns(connectivityManager);
         } else if (isNotVpnNetwork(connectivityManager, activeNetwork)) {
