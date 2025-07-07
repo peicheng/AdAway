@@ -97,6 +97,25 @@ public class DnsPacketProxy {
      * @param responsePayload The payload of the response
      */
     public void handleDnsResponse(IpPacket requestPacket, byte[] responsePayload) {
+
+        try {
+        // ✅ 使用 dnsjava 解析 DNS response
+        Message dnsMessage = new Message(responsePayload);
+
+        // ✅ 修改所有 Answer / Authority / Additional 的 TTL
+        int newTtl = 14400; // 自訂 TTL（秒）
+
+        updateSectionTtl(dnsMessage, Section.ANSWER, newTtl);
+        updateSectionTtl(dnsMessage, Section.AUTHORITY, newTtl);
+        updateSectionTtl(dnsMessage, Section.ADDITIONAL, newTtl);
+
+        // ✅ 將修改後的 DNS 封包轉為 byte[]
+        responsePayload = dnsMessage.toWire();
+
+        } catch (IOException e) {
+        e.printStackTrace(); // 可加 log
+        // 出錯就保留原始 payload
+        }
         UdpPacket udpOutPacket = (UdpPacket) requestPacket.getPayload();
         UdpPacket.Builder payLoadBuilder = new UdpPacket.Builder(udpOutPacket)
                 .srcPort(udpOutPacket.getHeader().getDstPort())
@@ -247,6 +266,25 @@ public class DnsPacketProxy {
         return entry;
     }
 
+    private void updateSectionTtl(Message msg, int section, int newTtl) {
+    Record[] records = msg.getSectionArray(section);
+    if (records != null) {
+        for (int i = 0; i < records.length; i++) {
+            Record original = records[i];
+            Record updated = Record.newRecord(
+                    original.getName(),
+                    original.getType(),
+                    original.getDClass(),
+                    newTtl,
+                    original.rdataToWireCanonical()
+            );
+            msg.removeRecord(original, section);
+            msg.addRecord(updated, section);
+        }
+    }
+}
+
+    
     /**
      * Interface abstracting away VpnWorker.
      */
