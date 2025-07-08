@@ -51,6 +51,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import timber.log.Timber;
 
@@ -77,7 +78,13 @@ public class DnsPacketProxy {
     private final EventLoop eventLoop;
     private final DnsServerMapper dnsServerMapper;
     private VpnModel vpnModel;
-    private final Map<String, byte[]> allowedCache = new HashMap<>();
+    //private final Map<String, byte[]> allowedCache = new HashMap<>();
+    private final LinkedHashMap<String, byte[]> allowedCache = new LinkedHashMap<>(16000, 0.75f, true) {
+    @Override
+    protected boolean removeEldestEntry(Map.Entry<String, byte[]> eldest) {
+        return size() > 15000;
+    }
+};
     
     public DnsPacketProxy(EventLoop eventLoop, DnsServerMapper dnsServerMapper) {
         this.eventLoop = eventLoop;
