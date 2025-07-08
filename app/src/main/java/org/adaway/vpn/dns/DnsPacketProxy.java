@@ -75,7 +75,8 @@ public class DnsPacketProxy {
     private final EventLoop eventLoop;
     private final DnsServerMapper dnsServerMapper;
     private VpnModel vpnModel;
-
+    private final Map<String, byte[]> allowedCache = new HashMap<>();
+    
     public DnsPacketProxy(EventLoop eventLoop, DnsServerMapper dnsServerMapper) {
         this.eventLoop = eventLoop;
         this.dnsServerMapper = dnsServerMapper;
@@ -226,9 +227,24 @@ public class DnsPacketProxy {
                 break;
             case ALLOWED:
                 Timber.i("handleDnsRequest: DNS Name %s allowed, sending to %s.", dnsQueryName, dnsAddress);
+                if (allowedCache.containsKey(dnsQueryName)) {
+                Timber.i("Cache hit: %s", dnsQueryName);
+                byte[] cachedResponse = allowedCache.get(dnsQueryName);
+                handleDnsResponse(ipPacket, cachedResponse);
+               } else {
+               Timber.i("Cache miss: %s, forwarding to %s", dnsQueryName, dnsAddress);
+               DatagramPacket outPacket = new DatagramPacket(dnsRawData, 0, dnsRawData.length, dnsAddress, packetPort);
+               this.eventLoop.forwardPacket(outPacket, data -> {
+                   allowedCache.put(dnsQueryName, data); // <-- Cache the response
+                   handleDnsResponse(ipPacket, data);
+                });
+                }
+                break;
+                /*
                 DatagramPacket outPacket = new DatagramPacket(dnsRawData, 0, dnsRawData.length, dnsAddress, packetPort);
                 this.eventLoop.forwardPacket(outPacket, data -> handleDnsResponse(ipPacket, data));
                 break;
+                */
             case REDIRECTED:
                 Timber.i("handleDnsRequest: DNS Name %s redirected to %s.", dnsQueryName, entry.getRedirection());
                 dnsMsg.getHeader().setFlag(Flags.QR);
