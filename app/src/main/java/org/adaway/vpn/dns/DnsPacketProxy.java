@@ -79,9 +79,16 @@ public class DnsPacketProxy {
     private final DnsServerMapper dnsServerMapper;
     private VpnModel vpnModel;
     //private final Map<String, byte[]> allowedCache = new HashMap<>();
+    /*
     private final LinkedHashMap<String, byte[]> allowedCache = new LinkedHashMap<>(16000, 0.75f, true) {
     @Override
     protected boolean removeEldestEntry(Map.Entry<String, byte[]> eldest) {
+        return size() > 15000;
+    }
+};*/
+    private final Map<String, InetAddress> allowedAddressCache = new LinkedHashMap<>(15000, 0.75f, true) {
+    @Override
+    protected boolean removeEldestEntry(Map.Entry<String, InetAddress> eldest) {
         return size() > 15000;
     }
 };
@@ -237,6 +244,55 @@ public class DnsPacketProxy {
                 handleDnsResponse(ipPacket, dnsMsg.toWire());
                 break;
             case ALLOWED:
+                Timber.i("handleDnsRequest: DNS Name %s allowed", dnsQueryName);
+
+                // Check if we have cached IP for this hostname
+                InetAddress cachedAddress = allowedAddressCache.get(dnsQueryName);
+                if (cachedAddress != null) {
+                    Timber.i("IP cache hit for hostname %s -> %s", dnsQueryName, cachedAddress.getHostAddress());
+
+                    // Manually build DNS response using cached address
+                    dnsMsg.getHeader().setFlag(Flags.QR);
+                    dnsMsg.getHeader().setFlag(Flags.AA);
+                    dnsMsg.getHeader().unsetFlag(Flags.RD);
+                    dnsMsg.getHeader().setRcode(Rcode.NOERROR);
+
+                    Record answerRecord;
+                    if (cachedAddress instanceof Inet6Address) {
+                        answerRecord = new AAAARecord(name, DClass.IN, NEGATIVE_CACHE_TTL_SECONDS, cachedAddress);
+                    } else {
+                        answerRecord = new ARecord(name, DClass.IN, NEGATIVE_CACHE_TTL_SECONDS, cachedAddress);
+                    }
+
+                    dnsMsg.addRecord(answerRecord, Section.ANSWER);
+                    handleDnsResponse(ipPacket, dnsMsg.toWire());
+                    break;
+                }
+
+                // No cached IP, forward to real DNS server
+                Timber.i("IP cache miss for hostname %s, forwarding to DNS server", dnsQueryName);
+                DatagramPacket outPacket = new DatagramPacket(dnsRawData, 0, dnsRawData.length, dnsAddress, packetPort);
+
+                this.eventLoop.forwardPacket(outPacket, data -> {
+                    try {
+                        Message response = new Message(data);
+                        for (Record record : response.getSectionArray(Section.ANSWER)) {
+                            if (record.getType() == Type.A || record.getType() == Type.AAAA) {
+                                InetAddress resolvedAddress = InetAddress.getByName(record.rdataToString());
+                                allowedAddressCache.put(dnsQueryName, resolvedAddress);
+                                Timber.i("Cached resolved IP for %s -> %s", dnsQueryName, resolvedAddress.getHostAddress());
+                                break; // Only cache first A/AAAA
+                            }
+                        }
+                    } catch (IOException e) {
+                        Timber.w(e, "Failed to parse DNS response for hostname %s", dnsQueryName);
+                    }
+
+                    handleDnsResponse(ipPacket, data);
+                });
+                break;
+
+                /*
                 Timber.i("handleDnsRequest: DNS Name %s allowed, sending to %s.", dnsQueryName, dnsAddress);
                 if (allowedCache.containsKey(dnsQueryName)) {
                 Timber.i("Cache hit: %s", dnsQueryName);
@@ -251,11 +307,15 @@ public class DnsPacketProxy {
                 });
                 }
                 break;
+                */
                 /*
                 DatagramPacket outPacket = new DatagramPacket(dnsRawData, 0, dnsRawData.length, dnsAddress, packetPort);
                 this.eventLoop.forwardPacket(outPacket, data -> handleDnsResponse(ipPacket, data));
                 break;
                 */
+            
+        
+                
             case REDIRECTED:
                 Timber.i("handleDnsRequest: DNS Name %s redirected to %s.", dnsQueryName, entry.getRedirection());
                 dnsMsg.getHeader().setFlag(Flags.QR);
