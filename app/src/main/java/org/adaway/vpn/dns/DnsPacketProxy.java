@@ -108,6 +108,7 @@ public class DnsPacketProxy {
      */
     public void handleDnsResponse(IpPacket requestPacket, byte[] responsePayload) {
 
+        /*
         try {
         // ✅ 使用 dnsjava 解析 DNS response
         Message dnsMessage = new Message(responsePayload);
@@ -126,6 +127,7 @@ public class DnsPacketProxy {
         e.printStackTrace(); // 可加 log
         // 出錯就保留原始 payload
         }
+        */
         UdpPacket udpOutPacket = (UdpPacket) requestPacket.getPayload();
         UdpPacket.Builder payLoadBuilder = new UdpPacket.Builder(udpOutPacket)
                 .srcPort(udpOutPacket.getHeader().getDstPort())
