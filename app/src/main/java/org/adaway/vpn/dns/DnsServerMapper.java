@@ -139,7 +139,7 @@ public class DnsServerMapper {
         try {
         return Arrays.asList(
             InetAddress.getByName("8.8.8.8"),
-            InetAddress.getByName("101.101.101.101")
+            InetAddress.getByName("8.8.4.4")
         );
     } catch (UnknownHostException e) {
         e.printStackTrace();
