@@ -21,8 +21,11 @@ android {
     defaultConfig {
         minSdk 26
         targetSdk 33
-        versionCode libs.versions.appCode.get() as int
-        versionName libs.versions.appName.get()
+        applicationId "org.adaway.mynext" 
+        versionCode 1
+        versionName "1.0"
+        //versionCode libs.versions.appCode.get() as int
+        //versionName libs.versions.appName.get()
 
         javaCompileOptions {
             annotationProcessorOptions {
