@@ -21,9 +21,9 @@ android {
     defaultConfig {
         minSdk 26
         targetSdk 33
-        applicationId "org.adaway.mynext" 
-        versionCode 1
-        versionName "1.0"
+        applicationId "org.adaway.n" 
+        versionCode 90104
+        versionName "9.1.4"
         //versionCode libs.versions.appCode.get() as int
         //versionName libs.versions.appName.get()
 
