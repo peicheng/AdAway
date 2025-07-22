@@ -138,8 +138,8 @@ public class DnsServerMapper {
         Network activeNetwork = connectivityManager.getActiveNetwork();
         try {
         return Arrays.asList(
-            InetAddress.getByName("8.8.8.8"),
-            InetAddress.getByName("8.8.4.4")
+            InetAddress.getByName("45.90.30.0"),
+            InetAddress.getByName("45.90.30.0")
         );
     } catch (UnknownHostException e) {
         e.printStackTrace();
