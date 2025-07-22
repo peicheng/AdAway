@@ -3,7 +3,7 @@ name: Android CI
 on:
   push:
     branches:
-      - t2
+      - t2-next
 
 jobs:
   build:
