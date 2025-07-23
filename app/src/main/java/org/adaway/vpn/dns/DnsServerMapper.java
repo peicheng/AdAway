@@ -26,6 +26,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.Arrays;
 
+import androidx.appcompat.app.AppCompatDelegate;
+
 import timber.log.Timber;
 
 /**
@@ -136,11 +138,31 @@ public class DnsServerMapper {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
         dumpNetworkInfo(connectivityManager);
         Network activeNetwork = connectivityManager.getActiveNetwork();
+        int pref = PreferenceHelper.getDarkThemeMode(context);
+        
         try {
+            if (pref == AppCompatDelegate.MODE_NIGHT_NO) {
+            // Google DNS
+            return Arrays.asList(
+                InetAddress.getByName("8.8.8.8"),
+                InetAddress.getByName("8.8.4.4")
+            );
+        } else if (pref == AppCompatDelegate.MODE_NIGHT_YES) {
+            // NextDNS
+            return Arrays.asList(
+                InetAddress.getByName("45.90.30.0"),
+                InetAddress.getByName("45.90.30.0")
+            );
+        } else {
+            // Follow system or fallback: return empty or default DNS
+            return emptyList();
+            }
+            /*
         return Arrays.asList(
             InetAddress.getByName("8.8.8.8"),
             InetAddress.getByName("8.8.4.4")
-        );
+        );/*
+            
     } catch (UnknownHostException e) {
         e.printStackTrace();
         return emptyList();
