@@ -138,7 +138,7 @@ public class DnsServerMapper {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
         dumpNetworkInfo(connectivityManager);
         Network activeNetwork = connectivityManager.getActiveNetwork();
-        int pref = PreferenceHelper.getDarkThemeMode(context))；
+        int pref = PreferenceHelper.getDarkThemeMode(context);
         try {
             if (pref == AppCompatDelegate.MODE_NIGHT_NO) {
             // Google DNS
