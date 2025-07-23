@@ -161,7 +161,8 @@ public class DnsServerMapper {
         return Arrays.asList(
             InetAddress.getByName("8.8.8.8"),
             InetAddress.getByName("8.8.4.4")
-        );/*
+        );
+        */
             
     } catch (UnknownHostException e) {
         e.printStackTrace();
