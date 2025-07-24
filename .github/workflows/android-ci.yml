@@ -3,7 +3,7 @@ name: Android CI
 on:
   push:
     branches:
-      - t2-switch 
+      - t2-switch-edit
 
 jobs:
   build:
