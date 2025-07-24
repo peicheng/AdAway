@@ -56,6 +56,13 @@ public final class PreferenceHelper {
                 return AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
         }
     }
+    public static String getCustomDnsIp(Context context) {
+    SharedPreferences prefs = context.getSharedPreferences(
+            Constants.PREFS_NAME,
+            Context.MODE_PRIVATE
+    );
+    return prefs.getString("custom_dns_ip", "8.8.8.8");
+    }
 
     public static boolean getUpdateCheck(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(
