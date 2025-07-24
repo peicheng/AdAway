@@ -167,7 +167,7 @@ public class DnsServerMapper {
             InetAddress.getByName("8.8.4.4")
         );
         */
-    string custom_ip = PreferenceHelper.getCustomDnsIp(context);
+    String custom_ip = PreferenceHelper.getCustomDnsIp(context);
     try{
         return Arrays.asList(
                 InetAddress.getByName(custom_ip)
