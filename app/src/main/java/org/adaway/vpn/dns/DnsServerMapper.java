@@ -138,6 +138,9 @@ public class DnsServerMapper {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
         dumpNetworkInfo(connectivityManager);
         Network activeNetwork = connectivityManager.getActiveNetwork();
+
+        
+        /*
         int pref = PreferenceHelper.getDarkThemeMode(context);
         
         try {
@@ -149,7 +152,7 @@ public class DnsServerMapper {
             );
         } else if (pref == AppCompatDelegate.MODE_NIGHT_YES) {
             // NextDNS
-            return Arrays.asList(
+            return Arrays.aPreferenceHelpersList(
                 InetAddress.getByName("45.90.30.0"),
                 InetAddress.getByName("45.90.30.0")
             );
@@ -157,13 +160,18 @@ public class DnsServerMapper {
             // Follow system or fallback: return empty or default DNS
             return emptyList();
             }
+        */
             /*
         return Arrays.asList(
             InetAddress.getByName("8.8.8.8"),
             InetAddress.getByName("8.8.4.4")
         );
         */
-            
+    string custom_ip = PreferenceHelper.getCustomDnsIp(context);
+    try{
+        return Arrays.asList(
+                InetAddress.getByName(custom_ip)
+            );
     } catch (UnknownHostException e) {
         e.printStackTrace();
         return emptyList();
