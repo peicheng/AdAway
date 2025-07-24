@@ -21,7 +21,7 @@
     app:summary="例如：8.8.8.8"
     app:dialogTitle="請輸入 IPv4 位址"
     app:defaultValue="8.8.8.8"
-    app:icon="@drawable/ic_dns_24dp"
+    app:icon="@drawable/ic_sync_24dp"
     android:inputType="text" />
     </PreferenceCategory>
 
