@@ -15,6 +15,14 @@
             app:fragment="org.adaway.ui.prefs.PrefsUpdateFragment"
             app:icon="@drawable/ic_sync_24dp"
             app:title="@string/pref_update_configuration" />
+        <EditTextPreference
+    app:key="custom_dns_ip"
+    app:title="輸入 DNS IP 位址"
+    app:summary="例如：8.8.8.8"
+    app:dialogTitle="請輸入 IPv4 位址"
+    app:defaultValue="8.8.8.8"
+    app:icon="@drawable/ic_dns_24dp"
+    android:inputType="text" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/pref_ad_block_category">
